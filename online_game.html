@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DEXO CHECKERS — Online</title>
+  <link rel="stylesheet" href="online_game.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- BACKGROUND -->
+  <div class="bg-board" id="bgBoard"></div>
+  <div class="bg-overlay"></div>
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" onclick="cancelSearch()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+      </svg>
+    </button>
+    <div class="topbar-title">
+      <span class="title-dexo">DEXO</span>
+      <span class="title-checkers">CHECKERS</span>
+    </div>
+    <div class="coin-mini">
+      <div class="coin-mini-icon">DX</div>
+      <span id="coinMiniAmount">—</span>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- IDLE STATE: raqib qidirish tugmasi -->
+    <div class="state-box" id="stateIdle">
+      <div class="idle-glow"></div>
+      <div class="vs-icon">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        </svg>
+      </div>
+      <h2 class="idle-title">ONLINE JANG</h2>
+      <p class="idle-desc">Dunyo bo'ylab haqiqiy raqib bilan<br/>shashkada bellashing va DX coin yuting!</p>
+
+      <div class="bet-row">
+        <span class="bet-label">GAROV MIQDORI</span>
+        <div class="bet-options">
+          <button class="bet-btn active" data-bet="10">10 DX</button>
+          <button class="bet-btn" data-bet="25">25 DX</button>
+          <button class="bet-btn" data-bet="50">50 DX</button>
+          <button class="bet-btn" data-bet="100">100 DX</button>
+        </div>
+      </div>
+
+      <button class="search-btn" id="searchBtn" onclick="startSearch()">
+        <span class="search-btn-inner">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          RAQIB QIDIRISH
+        </span>
+        <div class="search-btn-glow"></div>
+      </button>
+
+      <div class="online-count">
+        <span class="online-dot"></span>
+        <span id="onlineCountText">— nafar onlayn</span>
+      </div>
+    </div>
+
+    <!-- SEARCHING STATE -->
+    <div class="state-box hidden" id="stateSearching">
+      <div class="radar-wrap">
+        <div class="radar-ring r1"></div>
+        <div class="radar-ring r2"></div>
+        <div class="radar-ring r3"></div>
+        <div class="radar-center">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+          </svg>
+        </div>
+      </div>
+      <h2 class="searching-title">RAQIB QIDIRILMOQDA</h2>
+      <p class="searching-desc">Iltimos kuting...</p>
+      <div class="timer-wrap">
+        <span class="timer-label">VAQT</span>
+        <span class="timer-val" id="searchTimer">00:00</span>
+      </div>
+      <button class="cancel-btn" onclick="cancelSearch()">BEKOR QILISH</button>
+    </div>
+
+    <!-- FOUND STATE -->
+    <div class="state-box hidden" id="stateFound">
+      <div class="found-glow"></div>
+      <div class="players-row">
+        <div class="player-card you-card">
+          <div class="player-avatar you-avatar">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+            </svg>
+          </div>
+          <span class="player-name" id="myName">SEN</span>
+          <span class="player-id" id="myId">—</span>
+        </div>
+
+        <div class="vs-badge">VS</div>
+
+        <div class="player-card opp-card">
+          <div class="player-avatar opp-avatar">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+            </svg>
+          </div>
+          <span class="player-name" id="oppName">RAQIB</span>
+          <span class="player-id" id="oppId">—</span>
+        </div>
+      </div>
+      <p class="found-msg">Raqib topildi! O'yin boshlanmoqda...</p>
+      <div class="countdown-wrap">
+        <span class="countdown-num" id="countdown">3</span>
+      </div>
+    </div>
+
+    <!-- NOT FOUND STATE -->
+    <div class="state-box hidden" id="stateNotFound">
+      <div class="notfound-icon">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+      </div>
+      <h2 class="notfound-title">RAQIB TOPILMADI</h2>
+      <p class="notfound-desc">Hozir onlayn o'yinchilar mavjud emas.<br/>Keyinroq urinib ko'ring yoki bot bilan o'ynang.</p>
+      <div class="notfound-btns">
+        <button class="retry-btn" onclick="retrySearch()">QAYTA QIDIRISH</button>
+        <button class="offline-btn" onclick="window.location.href='offline_game.html'">BOT BILAN O'YNA</button>
+      </div>
+      <button class="back-link" onclick="window.location.href='game.html'">← Orqaga qaytish</button>
+    </div>
+
+  </main>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Firebase compat CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="online_game.js"></script>
+</body>
+</html>

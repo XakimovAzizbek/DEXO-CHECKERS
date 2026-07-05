@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DEXO CHECKERS — O'yin</title>
+  <link rel="stylesheet" href="game.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- BACKGROUND -->
+  <div class="bg-board" id="bgBoard"></div>
+  <div class="bg-overlay"></div>
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <button class="back-btn" onclick="window.location.href='home.html'">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+      </svg>
+    </button>
+    <div class="topbar-title">
+      <span class="title-dexo">DEXO</span>
+      <span class="title-checkers">CHECKERS</span>
+    </div>
+    <div class="coin-mini" id="coinMini">
+      <div class="coin-mini-icon">DX</div>
+      <span id="coinMiniAmount">—</span>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- MODE CARD -->
+    <div class="mode-container">
+
+      <div class="mode-label">O'YIN REJIMINI TANLANG</div>
+
+      <!-- ONLINE -->
+      <div class="mode-card online-card" id="onlineCard" onclick="goOnline()">
+        <div class="mode-card-glow online-glow"></div>
+        <div class="mode-icon-wrap online-icon-wrap">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <span class="mode-title">ONLINE</span>
+          <span class="mode-desc">Haqiqiy raqib bilan o'yna<br/>DX coin yutib ol!</span>
+        </div>
+        <div class="mode-badge online-badge">
+          <span class="badge-dot"></span>
+          JONLI
+        </div>
+        <div class="mode-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- DIVIDER -->
+      <div class="divider-row">
+        <div class="divider-line"></div>
+        <span class="divider-text">yoki</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- OFFLINE -->
+      <div class="mode-card offline-card" id="offlineCard" onclick="goOffline()">
+        <div class="mode-card-glow offline-glow"></div>
+        <div class="mode-icon-wrap offline-icon-wrap">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 6.5C21 4.57 19.43 3 17.5 3c-1.27 0-2.37.65-3.02 1.62L6.62 8.5C6.1 8.19 5.52 8 4.9 8 3.3 8 2 9.3 2 10.9s1.3 2.9 2.9 2.9c.36 0 .7-.07 1.02-.19l.96 1.93C6.33 15.96 6 16.69 6 17.5 6 19.43 7.57 21 9.5 21s3.5-1.57 3.5-3.5c0-.62-.17-1.2-.46-1.7l4.1-4.1c.5.19 1.04.3 1.6.3 1.93 0 3.5-1.57 3.5-3.5z"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <span class="mode-title">OFFLINE</span>
+          <span class="mode-desc">Bot bilan mashq qiling<br/>Internet shart emas</span>
+        </div>
+        <div class="mode-badge offline-badge">
+          <span class="badge-dot offline-dot"></span>
+          BOT
+        </div>
+        <div class="mode-arrow offline-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- INFO ROW -->
+      <div class="info-row">
+        <div class="info-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/>
+          </svg>
+          <span>Online o'yinda garov qo'yiladi</span>
+        </div>
+        <div class="info-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+          </svg>
+          <span>Offline bepul, cheksiz o'yin</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="home.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+      <span>Home</span>
+    </a>
+    <a class="nav-item" href="boost.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+      <span>Boost</span>
+    </a>
+    <a class="nav-item" href="profile.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+      </svg>
+      <span>Profile</span>
+    </a>
+  </nav>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Firebase compat CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

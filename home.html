@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DEXO CHECKERS</title>
+  <link rel="stylesheet" href="home.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- BACKGROUND BOARD -->
+  <div class="bg-board" id="bgBoard"></div>
+  <div class="bg-overlay"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand-logo">
+      <span class="brand-dexo">DEXO</span>
+      <span class="brand-checkers">CHECKERS</span>
+    </div>
+    <div class="coin-box" id="coinBox">
+      <div class="coin-icon">
+        <span class="coin-letter">DX</span>
+      </div>
+      <div class="coin-info">
+        <span class="coin-label">DX Coin</span>
+        <span class="coin-amount" id="coinAmount">— — —</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="hero-section">
+      <div class="hero-glow"></div>
+      <h1 class="hero-title">SHASHKA<br/><span class="hero-accent">JANG MAYDONI</span></h1>
+      <p class="hero-desc">Onlayn oʻynang, DX coin yutib oling.<br/>Bot yoki haqiqiy raqib bilan bellashing!</p>
+      <button class="play-btn" onclick="window.location.href='game.html'">
+        <span class="play-btn-inner">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          O'YINNI BOSHLASH
+        </span>
+        <div class="play-btn-glow"></div>
+      </button>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-val" id="statWins">0</span>
+          <span class="stat-lbl">G'alabalar</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-card">
+          <span class="stat-val" id="statLosses">0</span>
+          <span class="stat-lbl">Mag'lubiyat</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-card">
+          <span class="stat-val" id="statGames">0</span>
+          <span class="stat-lbl">Jami o'yin</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a class="nav-item active" href="home.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+      <span>Home</span>
+    </a>
+    <a class="nav-item" href="boost.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+      <span>Boost</span>
+    </a>
+    <a class="nav-item" href="profile.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/>
+      </svg>
+      <span>Profile</span>
+    </a>
+  </nav>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Firebase compat CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="home.js"></script>
+</body>
+</html>
