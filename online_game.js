@@ -38,9 +38,8 @@ let searchTimerSec   = 0;
 let searchInterval   = null;
 let queueDocRef      = null;
 let queueListener    = null;
-let roomListener     = null;
 let currentRoomId    = null;
-const SEARCH_TIMEOUT = 30; // 30 soniya kutish
+const SEARCH_TIMEOUT = 30;
 
 // =============================================
 //  INIT
@@ -52,16 +51,16 @@ if (TG_ID && !TG_ID.startsWith('test_')) {
     if (snap.exists) {
       coinMiniAmountEl.textContent = formatNumber(snap.data().dxCoin ?? 0);
     }
-  });
+  }, () => {});
 }
 
-// Onlayn o'yinchilar sonini ko'rsatish
-function watchOnlineCount() {
-  db.collection('queue').onSnapshot(snap => {
-    onlineCountTextEl.textContent = snap.size + ' nafar onlayn';
-  });
-}
-watchOnlineCount();
+// ── Onlayn o'yinchilar soni (index talab qilmaydi — JS da filter) ──
+db.collection('queue').onSnapshot(snap => {
+  const waiting = snap.docs.filter(d => d.data().status === 'waiting');
+  onlineCountTextEl.textContent = waiting.length + ' nafar onlayn';
+}, err => {
+  console.error('Queue listen:', err);
+});
 
 // Garov tugmalari
 document.querySelectorAll('.bet-btn').forEach(btn => {
@@ -80,23 +79,25 @@ async function startSearch() {
   showState('stateSearching');
   startTimer();
 
-  // Avval queue da kutayotgan boshqa o'yinchini qidirish
   try {
+    // FIX: faqat bitta where — composite index talab qilmaydi
+    // status filterni JS da qilamiz
     const snap = await db.collection('queue')
-      .where('bet', '==', selectedBet)
       .where('status', '==', 'waiting')
-      .limit(5)
       .get();
 
-    // O'zini filtrlab, boshqa o'yinchini topish
-    const others = snap.docs.filter(d => d.id !== TG_ID);
+    // O'zidan boshqa, xuddi shu garovdagi o'yinchi
+    const others = snap.docs.filter(d =>
+      d.id !== TG_ID &&
+      d.data().bet === selectedBet
+    );
 
     if (others.length > 0) {
       // Raqib topildi — xona yaratamiz
       const opponent = others[0];
       await matchPlayers(TG_ID, opponent.id, opponent.data().name || 'Raqib', selectedBet);
     } else {
-      // Hech kim yo'q — o'zimizni queue ga qo'yamiz
+      // Hech kim yo'q — queue ga qo'shamiz va kutamiz
       await joinQueue();
     }
   } catch (err) {
@@ -120,71 +121,70 @@ async function joinQueue() {
     joinedAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
-  // Queue da o'zimizni kuzatamiz — kimdir xona yaratib bizni roomId bilan yangilaydi
+  // O'zimizni real-time kuzatamiz
   queueListener = queueDocRef.onSnapshot(snap => {
     if (!snap.exists) return;
     const data = snap.data();
-
     if (data.status === 'matched' && data.roomId) {
-      // Raqib topildi, xonaga kiring
       stopTimer();
-      listenRoom(data.roomId, data.opponentId, data.opponentName || 'Raqib');
+      showFoundScreen(data.roomId, data.opponentId, data.opponentName || 'Raqib');
     }
+  }, err => {
+    console.error('Queue snapshot error:', err);
+    showNotFound();
   });
 
-  // 30 soniya kutib, topilmasa bekor qilish
+  // 30 soniyada hech kim kelmasa — topilmadi
   setTimeout(async () => {
-    if (queueListener) {
+    if (!queueListener) return;
+    try {
       const snap = await queueDocRef.get();
       if (snap.exists && snap.data().status === 'waiting') {
         await cancelQueue();
         showNotFound();
       }
-    }
+    } catch (e) {}
   }, SEARCH_TIMEOUT * 1000);
 }
 
 // =============================================
-//  2 O'YINCHINI ULASH (birinchi topgan yaratadi)
+//  2 O'YINCHINI ULASH
 // =============================================
 
 async function matchPlayers(player1Id, player2Id, player2Name, bet) {
   const roomId = 'room_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
 
-  // Xona yaratish
-  await db.collection('rooms').doc(roomId).set({
-    player1     : player1Id,
-    player1Name : TG_NAME,
-    player2     : player2Id,
-    player2Name : player2Name,
-    bet         : bet,
-    status      : 'starting',
-    turn        : player1Id,
-    createdAt   : firebase.firestore.FieldValue.serverTimestamp()
-  });
+  try {
+    // Xona yaratish
+    await db.collection('rooms').doc(roomId).set({
+      player1     : player1Id,
+      player1Name : TG_NAME,
+      player2     : player2Id,
+      player2Name : player2Name,
+      bet         : bet,
+      status      : 'starting',
+      turn        : player1Id,
+      createdAt   : firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-  // 2-o'yinchining queue yozuvini yangilash
-  await db.collection('queue').doc(player2Id).update({
-    status      : 'matched',
-    roomId      : roomId,
-    opponentId  : player1Id,
-    opponentName: TG_NAME
-  });
+    // 2-o'yinchining queue yozuvini matched qilish
+    await db.collection('queue').doc(player2Id).update({
+      status      : 'matched',
+      roomId      : roomId,
+      opponentId  : player1Id,
+      opponentName: TG_NAME
+    });
 
-  // O'zimizni queue dan o'chiramiz (birinchi o'yinchi sifatida)
-  await db.collection('queue').doc(player1Id).delete().catch(() => {});
+    // O'zimizni queue dan o'chirish
+    await db.collection('queue').doc(player1Id).delete().catch(() => {});
 
-  // Topildi ekraniga o'tish
-  showFoundScreen(roomId, player2Id, player2Name);
-}
+    // Topildi ekrani
+    showFoundScreen(roomId, player2Id, player2Name);
 
-// =============================================
-//  XONA KUZATISH (2-o'yinchi uchun)
-// =============================================
-
-function listenRoom(roomId, opponentId, opponentName) {
-  currentRoomId = roomId;
-  showFoundScreen(roomId, opponentId, opponentName);
+  } catch (err) {
+    console.error('matchPlayers error:', err);
+    showNotFound();
+  }
 }
 
 // =============================================
@@ -197,13 +197,12 @@ function showFoundScreen(roomId, opponentId, opponentName) {
   if (queueListener) { queueListener(); queueListener = null; }
 
   myNameEl.textContent  = TG_NAME.toUpperCase();
-  myIdEl.textContent    = 'ID: ' + TG_ID.slice(0, 8);
-  oppNameEl.textContent = opponentName.toUpperCase();
-  oppIdEl.textContent   = 'ID: ' + String(opponentId).slice(0, 8);
+  myIdEl.textContent    = 'ID: ' + String(TG_ID).slice(0, 10);
+  oppNameEl.textContent = String(opponentName).toUpperCase();
+  oppIdEl.textContent   = 'ID: ' + String(opponentId).slice(0, 10);
 
   showState('stateFound');
 
-  // 3...2...1 countdown
   let count = 3;
   countdownEl.textContent = count;
 
@@ -297,8 +296,8 @@ function showNotFound() {
 // =============================================
 
 function formatNumber(n) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-  if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000)    return (n / 1000).toFixed(1) + 'K';
   return n.toString();
 }
 
